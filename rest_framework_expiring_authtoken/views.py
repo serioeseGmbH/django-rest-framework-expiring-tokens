@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from rest_framework_expiring_authtoken.models import ExpiringToken
+from rest_framework_expiring_authtoken.settings import token_settings
 
 
 class ObtainExpiringAuthToken(ObtainAuthToken):
@@ -33,7 +34,10 @@ class ObtainExpiringAuthToken(ObtainAuthToken):
                     user=serializer.validated_data['user']
                 )
 
-            data = {'token': token.key}
+            data = {
+                'token': token.key,
+                'expires': token.created + token_settings.EXPIRING_TOKEN_LIFESPAN
+            }
             return Response(data)
 
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

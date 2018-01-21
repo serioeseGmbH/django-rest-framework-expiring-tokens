@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from rest_framework_expiring_authtoken.models import ExpiringToken
+from rest_framework_expiring_authtoken.settings import token_settings
 
 
 class ObtainExpiringTokenViewTestCase(APITestCase):
@@ -39,8 +40,12 @@ class ObtainExpiringTokenViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Check the response contains the token key.
+        # Check the response contains the token key and a correct expiry date.
         self.assertEqual(token.key, response.data['token'])
+        self.assertEqual(
+            token.created + token_settings.EXPIRING_TOKEN_LIFESPAN,
+            response.data['expires']
+        )
 
     def test_post_create_token(self):
         """Check token is created if none exists."""
